@@ -70,8 +70,8 @@ public class RedisMapFactory implements AutoCloseable {
      * Создать типизированную фабрику, фиксирующую типы ключей и значений.
      * После этого при создании карт не нужно указывать классы.
      */
-    public <K, V> TypedRedisMapFactory<K, V> typed(Class<K> keyClass, Class<V> valueClass) {
-        return new TypedRedisMapFactory<>(this, keyClass, valueClass);
+    public <K, V> Typed<K, V> typed(Class<K> keyClass, Class<V> valueClass) {
+        return new Typed<>(this, keyClass, valueClass);
     }
 
     @Override
@@ -82,15 +82,15 @@ public class RedisMapFactory implements AutoCloseable {
     /**
      * Типизированная фабрика для нескольких карт с одинаковыми K и V.
      */
-    public static final class TypedRedisMapFactory<K, V> {
+    public static final class Typed<K, V> {
 
         private final RedisMapFactory redisMapFactory;
         private final Class<K> keyClass;
         private final Class<V> valueClass;
 
-        private TypedRedisMapFactory(RedisMapFactory redisMapFactory,
-                                     Class<K> keyClass,
-                                     Class<V> valueClass) {
+        private Typed(RedisMapFactory redisMapFactory,
+                      Class<K> keyClass,
+                      Class<V> valueClass) {
             this.redisMapFactory = redisMapFactory;
             this.keyClass = Objects.requireNonNull(keyClass, "keyClass must not be null");
             this.valueClass = Objects.requireNonNull(valueClass, "valueClass must not be null");
