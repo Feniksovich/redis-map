@@ -10,6 +10,8 @@ import java.util.logging.Logger;
 
 public class Main {
 
+    private static final String REDIS_HOST = "localhost";
+    private static final int REDIS_PORT = 6379;
     private static final Logger LOGGER = Logger.getLogger(Main.class.getName());
 
     public static void main(String[] args) {
@@ -19,12 +21,7 @@ public class Main {
                 "3", new TestData("3", 3, false, List.of("E", "F"))
         );
 
-        final JedisPool jedisPool = new JedisPool(
-                new JedisPoolConfig(),
-                System.getenv("REDIS_HOST"),
-                Integer.parseInt(System.getenv("REDIS_PORT"))
-        );
-
+        final JedisPool jedisPool = new JedisPool(new JedisPoolConfig(), REDIS_HOST, REDIS_PORT);
         try (final RedisMapFactory factory = RedisMapFactory.builder()
                 .jedisPool(jedisPool).build()
         ) {
@@ -38,6 +35,8 @@ public class Main {
 
             redisMap.forEach((id, data) ->
                     LOGGER.info("%s: %s".formatted(id, data)));
+
+            redisMap.clear();
         }
     }
 }
