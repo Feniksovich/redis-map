@@ -27,16 +27,22 @@ public class RedisMap<K, V> implements Map<K, V> {
 
     private final JedisPool jedisPool;
     private final ObjectMapper objectMapper;
+    /**
+     * Redis-ключ hash-структуры, в которой хранится содержимое карты.
+     */
     private final String redisKey;
     private final Class<K> keyClass;
     private final Class<V> valueClass;
 
+    /**
+     * Размер пачки элементов, возвращаемых командой {@code HSCAN}.
+     */
     private static final int SCAN_CHUNK_SIZE = 32;
+    /**
+     * Параметры {@code HSCAN} для постраничного обхода значений.
+     */
     private static final ScanParams SCAN_PARAMS = new ScanParams().count(SCAN_CHUNK_SIZE);
 
-    /**
-     * Основной конструктор с полностью настраиваемыми зависимостями.
-     */
     protected RedisMap(JedisPool jedisPool,
                        ObjectMapper objectMapper,
                        String redisKey,
@@ -49,6 +55,12 @@ public class RedisMap<K, V> implements Map<K, V> {
         this.valueClass = Objects.requireNonNull(valueClass, "valueClass must not be null");
     }
 
+    /**
+     * Сериализует ключ карты в строку для сохранения в Redis.
+     *
+     * @param key ключ, который необходимо сериализовать
+     * @return строковое представление ключа
+     */
     private String serializeKey(K key) {
         Objects.requireNonNull(key, "key must not be null");
         try {
@@ -58,6 +70,12 @@ public class RedisMap<K, V> implements Map<K, V> {
         }
     }
 
+    /**
+     * Сериализует значение карты в строку для хранения в Redis.
+     *
+     * @param value значение, которое необходимо сериализовать
+     * @return строковое представление значения
+     */
     private String serializeValue(V value) {
         Objects.requireNonNull(value, "value must not be null");
         try {
@@ -67,6 +85,12 @@ public class RedisMap<K, V> implements Map<K, V> {
         }
     }
 
+    /**
+     * Десериализует строковое представление ключа в объект указанного типа.
+     *
+     * @param data строка, полученная из Redis
+     * @return восстановленный ключ
+     */
     private K deserializeKey(String data) {
         try {
             return objectMapper.readValue(data, keyClass);
@@ -75,6 +99,12 @@ public class RedisMap<K, V> implements Map<K, V> {
         }
     }
 
+    /**
+     * Десериализует строковое представление значения в объект указанного типа.
+     *
+     * @param data строка, полученная из Redis
+     * @return восстановленное значение
+     */
     private V deserializeValue(String data) {
         try {
             return objectMapper.readValue(data, valueClass);
